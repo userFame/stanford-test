@@ -8,49 +8,48 @@
 import SwiftUI
 
 struct ContentView: View {
-    var emojis = ["🚌","🚎","🚗","🚕","🏎️","🚓","🚑","🚒"]
-    @ State var emojiCount: Int = 4
+    let viewModel: EmojiMemoryGame
     
     var body: some View {
         
         VStack {
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))]) {
-                    ForEach(emojis[0..<emojiCount], id: \.self, content: { emoji in
-                        CardView(content: emoji).aspectRatio(2/3, contentMode: .fit)
-                    })
+                    ForEach(viewModel.cards) { card in
+                        CardView(card: card).aspectRatio(2/3, contentMode: .fit)
+                    }
                 }
             }
-            .foregroundColor(.red) 
+            .foregroundColor(.red)
+            .padding(.horizontal)
+            
         }
-        .padding(.horizontal)
-        
     }
-}
-
-struct CardView: View {
-    var content: String
-    @State var isFaceUp: Bool = true
-    let shape = RoundedRectangle(cornerRadius: 20)
-    var body: some View {
-        ZStack {
-            if isFaceUp {
-                shape.fill().foregroundColor(.white)
-                shape.strokeBorder(lineWidth: 3)
-                Text(content)
-            } else {
-                shape.fill()
+    
+    struct CardView: View {
+        let card: MemoryGame<String>.Card
+        let shape = RoundedRectangle(cornerRadius: 20)
+        var body: some View {
+            ZStack {
+                if card.isFaceUp {
+                    shape.fill().foregroundColor(.white)
+                    shape.strokeBorder(lineWidth: 3)
+                    Text(card.content)
+                } else {
+                    shape.fill()
+                }
             }
-        }.onTapGesture {
-            isFaceUp = !isFaceUp
+            .font(.largeTitle)
         }
-        .font(.largeTitle)
     }
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView().preferredColorScheme(.light)
-        ContentView().preferredColorScheme(.dark)
+    
+    struct ContentView_Previews: PreviewProvider {
+        static var previews: some View {
+            let game = EmojiMemoryGame()
+            ContentView(viewModel: game)
+                .preferredColorScheme(.light)
+            ContentView(viewModel: game)
+                .preferredColorScheme(.dark)
+        }
     }
 }
